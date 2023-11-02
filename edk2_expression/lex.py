@@ -65,7 +65,7 @@ class Edk2ExpressionLexer(RegexLexer):
                 bygroups(Keyword.Declaration, Name.Variable, Keyword.Declaration),
             ),
             # (  # <MacroDefined>
-            #     rf'\b(DEFINED)(\(")({CName})("\))',
+            #     rf"\b(DEFINED)(\()({CName})(\))",
             #     bygroups(Keyword.Type, Punctuation, Name.Variable, Punctuation),
             # ),
             (rf"\b{CName}\b", Name.Variable),  # <CName>
