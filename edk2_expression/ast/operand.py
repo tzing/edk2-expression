@@ -253,6 +253,8 @@ class MacroVal(Expression):
         val = context.get(self.macro)
         if val is None:
             raise EvaluationError(f"Macro '{self.macro}' is not defined")
+        if isinstance(val, Constant):
+            return val.evaluate(context)
         if isinstance(val, Expression):
             nest = NestMethod(nest)
             if nest == NestMethod.Error:

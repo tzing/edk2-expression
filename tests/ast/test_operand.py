@@ -1,6 +1,6 @@
 import uuid
 from unittest import TestCase
-from unittest.mock import Mock, patch, MagicMock
+from unittest.mock import MagicMock, Mock, patch
 
 from pygments.token import Token
 
@@ -229,26 +229,30 @@ class TestMacroVal(TestCase):
         with self.assertRaises(EvaluationError):
             t.MacroVal("FOO").evaluate({})
 
-    def test_evaluate_nested(self):
+    def test_evaluate_nested_const(self):
+        inner = Mock(spec=t.Constant)
+        inner.evaluate.return_value = 3
+        self.assertEqual(t.MacroVal("FOO").evaluate({"FOO": inner}), 3)
+
+    def test_evaluate_nested_error(self):
         inner = MagicMock(spec=Expression)
         inner.__str__.return_value = "<Expr>"
-        inner.evaluate.return_value = 3
-
-        obj = t.MacroVal("FOO")
-
-        # default: error
         with self.assertRaises(EvaluationError) as cm:
-            obj.evaluate({"FOO": inner})
+            t.MacroVal("FOO").evaluate({"FOO": inner}, "error")
         self.assertEqual(
             str(cm.exception),
             "Nested expression found in '$(FOO)': <Expr>",
         )
 
-        # ignore
+    def test_evaluate_nested_ignore(self):
+        inner = Mock(spec=Expression)
+        obj = t.MacroVal("FOO")
         self.assertIs(obj.evaluate({"FOO": inner}, "ignore"), obj)
 
-        # evaluate
-        self.assertEqual(obj.evaluate({"FOO": inner}, "evaluate"), 3)
+    def test_evaluate_nested_evaluate(self):
+        inner = Mock(spec=Expression)
+        inner.evaluate.return_value = 3
+        self.assertEqual(t.MacroVal("FOO").evaluate({"FOO": inner}, "evaluate"), 3)
 
 
 class TestMacroDefined(TestCase):
