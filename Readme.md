@@ -127,6 +127,9 @@ The syntax is defined as follows in EBNF:
 This function is not defined in EDK II specification therefore it is disabled by default.
 To enable it, manually uncomment the lines for `<MacroDefined>` in [lexer](./edk2_expression/lex.py).
 
+## Changelog
+
+See [Changelog.md](./Changelog.md).
 
 ## License
 
