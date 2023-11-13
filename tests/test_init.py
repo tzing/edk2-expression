@@ -1,7 +1,6 @@
 from unittest import TestCase
 
 import edk2_expression
-
 from edk2_expression.ast import Expression
 
 

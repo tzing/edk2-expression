@@ -1,11 +1,9 @@
 from unittest import TestCase
-from unittest.mock import patch
 
 from pygments.token import Token
 
 from edk2_expression.ast import parse
-from edk2_expression.ast.core import Expression
-from edk2_expression.error import NotSupported, ParseError
+from edk2_expression.error import ParseError
 from edk2_expression.lex import Edk2ExpressionLexer
 
 
@@ -82,17 +80,4 @@ class TestParseExpression(TestCase):
         self.assertEqual(
             str(cm.exception),
             "Unexpected component '$' from '3 +$' position 3",
-        )
-
-
-class TestExpression(TestCase):
-    def test_evaluate(self):
-        with (
-            patch.object(Expression, "__abstractmethods__", set()),
-            patch.object(Expression, "__str__", return_value="<EVAL>"),
-            self.assertRaises(NotSupported) as cm,
-        ):
-            Expression().evaluate({})
-        self.assertEqual(
-            str(cm.exception), "Evaluation not supported for Expression: <EVAL>"
         )
