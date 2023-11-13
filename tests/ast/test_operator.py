@@ -275,18 +275,6 @@ class TestBinaryOp(TestCase):
 
         self.assertEqual(str(expr), "(foo | bar)")
 
-    def test_LogicalAnd(self):
-        expr = t.LogicalAnd(self.left, self.right)
-
-        self.left.evaluate.return_value = True
-        self.right.evaluate.return_value = True
-        self.assertTrue(expr.evaluate({}))
-
-        self.right.evaluate.return_value = False
-        self.assertFalse(expr.evaluate({}))
-
-        self.assertEqual(str(expr), "foo && bar")
-
     def test_LogicalXor(self):
         expr = t.LogicalXor(self.left, self.right)
 
@@ -299,17 +287,72 @@ class TestBinaryOp(TestCase):
 
         self.assertEqual(str(expr), "foo xor bar")
 
-    def test_LogicalOr(self):
-        expr = t.LogicalOr(self.left, self.right)
 
+class TestLogicalAnd(TestCase):
+    def setUp(self):
+        self.left = MagicMock(spec=Expression)
+        self.right = MagicMock(spec=Expression)
+        self.expr = t.LogicalAnd(self.left, self.right)
+
+    def test_str(self):
+        self.left.__str__.return_value = "foo"
+        self.right.__str__.return_value = "bar"
+        self.assertEqual(str(self.expr), "foo && bar")
+
+    def test_evaluate_1(self):
+        # basic
         self.left.evaluate.return_value = True
-        self.right.evaluate.return_value = False
-        self.assertTrue(expr.evaluate({}))
+        self.right.evaluate.side_effect = [True, False]
+        self.assertIs(self.expr.evaluate({}), True)
+        self.assertIs(self.expr.evaluate({}), False)
 
+    def test_evaluate_2(self):
+        # make sure right hand side is not evaluated when left hand side is False
         self.left.evaluate.return_value = False
-        self.assertFalse(expr.evaluate({}))
+        self.right.evaluate.side_effect = RuntimeError
+        self.assertIs(self.expr.evaluate({}), False)
 
-        self.assertEqual(str(expr), "(foo || bar)")
+    def test_evaluate_3(self):
+        # nested
+        self.right.evaluate.return_value = Mock(spec=Expression)
+        self.assertIs(self.expr.evaluate({}, nest="ignore"), self.expr)
+
+    def test_evaluate_4(self):
+        # early escape on nested expression
+        self.left.evaluate.return_value = Mock(spec=Expression)
+        self.right.evaluate.side_effect = RuntimeError
+        self.assertIs(self.expr.evaluate({}, nest="ignore"), self.expr)
+
+    def test_evaluate_5(self):
+        # nested expression error
+        self.left.evaluate.return_value = Mock(spec=Expression)
+        with self.assertRaises(RuntimeError):
+            self.expr.evaluate({}, nest="evaluate")
+
+
+class TestLogicalOr(TestCase):
+    def setUp(self):
+        self.left = MagicMock(spec=Expression)
+        self.right = MagicMock(spec=Expression)
+        self.expr = t.LogicalOr(self.left, self.right)
+
+    def test_str(self):
+        self.left.__str__.return_value = "foo"
+        self.right.__str__.return_value = "bar"
+        self.assertEqual(str(self.expr), "(foo || bar)")
+
+    def test_evaluate_1(self):
+        # basic
+        self.left.evaluate.side_effect = [False, False, True]
+        self.right.evaluate.side_effect = [True, False, True]
+        self.assertIs(self.expr.evaluate({}), True)
+        self.assertIs(self.expr.evaluate({}), False)
+        self.assertIs(self.expr.evaluate({}), True)
+
+    def test_evaluate_2(self):
+        # early escape on nested expression
+        self.left.evaluate.side_effect = t.LazyEvaluated.Skip
+        self.assertIs(self.expr.evaluate({}), self.expr)
 
 
 class TestTernaryOp(TestCase):

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "edk2-expression"
-version = "0.1.1"
+version = "0.2.0"
 description = "EDK II metadata expression syntax parser"
 authors = ["Tzu-Ting <tzingshih@gmail.com>"]
 license = "MIT"

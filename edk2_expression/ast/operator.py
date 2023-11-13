@@ -199,10 +199,13 @@ class BitwiseNot(UnaryOp):
 
 
 @dataclass(frozen=True)
-class BinaryOp(Operator):
+class BinaryOpBase(Operator):
     left: Expression
     right: Expression
 
+
+@dataclass(frozen=True)
+class BinaryOp(BinaryOpBase):
     def evaluate(
         self, context: dict[str, object], nest: NestMethod | str = _DEFAULT_NEST_METHOD
     ) -> object:
@@ -383,16 +386,6 @@ class BitwiseOr(BinaryOp):
 
 
 @dataclass(frozen=True)
-class LogicalAnd(BinaryOp):
-    def __str__(self) -> str:
-        return f"{self.left} && {self.right}"
-
-    @classmethod
-    def compare(self, a: object, b: object) -> bool:
-        return bool(a) and bool(b)
-
-
-@dataclass(frozen=True)
 class LogicalXor(BinaryOp):
     def __str__(self) -> str:
         return f"{self.left} xor {self.right}"
@@ -402,14 +395,60 @@ class LogicalXor(BinaryOp):
         return bool(a) != bool(b)
 
 
+class LazyEvaluated:
+    class Skip(Exception):
+        ...
+
+    def __init__(
+        self,
+        expr: Expression,
+        context: dict[str, object],
+        nest: NestMethod | str,
+    ) -> None:
+        self.expr = expr
+        self.context = context
+        self.nest = nest
+
+    def __bool__(self) -> bool:
+        value = self.expr.evaluate(self.context, self.nest)
+        if isinstance(value, Expression):
+            nest = NestMethod(self.nest)
+            if nest == NestMethod.Ignore:
+                raise self.Skip
+            raise RuntimeError("Unknown error for nested expression")
+        return bool(value)
+
+
 @dataclass(frozen=True)
-class LogicalOr(BinaryOp):
+class LogicalAnd(BinaryOpBase):
+    def __str__(self) -> str:
+        return f"{self.left} && {self.right}"
+
+    def evaluate(
+        self, context: dict[str, object], nest: NestMethod | str = _DEFAULT_NEST_METHOD
+    ) -> object:
+        left = LazyEvaluated(self.left, context, nest)
+        right = LazyEvaluated(self.right, context, nest)
+        try:
+            return bool(left) and bool(right)
+        except LazyEvaluated.Skip:
+            return self
+
+
+@dataclass(frozen=True)
+class LogicalOr(BinaryOpBase):
     def __str__(self) -> str:
         return f"({self.left} || {self.right})"
 
-    @classmethod
-    def compare(self, a: object, b: object) -> bool:
-        return bool(a) or bool(b)
+    def evaluate(
+        self, context: dict[str, object], nest: NestMethod | str = _DEFAULT_NEST_METHOD
+    ) -> object:
+        left = LazyEvaluated(self.left, context, nest)
+        right = LazyEvaluated(self.right, context, nest)
+        try:
+            return bool(left) or bool(right)
+        except LazyEvaluated.Skip:
+            return self
 
 
 @dataclass(frozen=True)

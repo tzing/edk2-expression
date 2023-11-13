@@ -1,8 +1,9 @@
 # Changelog
 
-## Unreleased
+## 0.2.0 (2023-11-14)
 
 * Enhance: `NestMethod` now supports case-insensitive matching
+* Enhance: Early termination is now supported for Logical AND (`&&`) and Logical OR (`||`) during value evaluation
 
 ## 0.1.1 (2023-11-03)
 
