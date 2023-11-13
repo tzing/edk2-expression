@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Enhance: `NestMethod` now supports case-insensitive matching
+
 ## 0.1.1 (2023-11-03)
 
 * Enhance: Do not raise error on nested constant

@@ -21,6 +21,13 @@ class NestMethod(str, enum.Enum):
     Evaluate = "evaluate"
     """Evaluate nested expressions and return the result."""
 
+    @classmethod
+    def _missing_(cls, value: str) -> NestMethod | None:
+        name = value.lower()
+        for member in cls:
+            if member.value == name:
+                return member
+
 
 _DEFAULT_NEST_METHOD = NestMethod.Error
 

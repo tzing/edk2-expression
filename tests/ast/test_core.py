@@ -1,8 +1,18 @@
 from unittest import TestCase
 from unittest.mock import patch
 
-from edk2_expression.ast.core import Expression
+from edk2_expression.ast.core import Expression, NestMethod
 from edk2_expression.error import NotSupported
+
+
+class TestNestMethod(TestCase):
+    def test_missing(self):
+        self.assertEqual(NestMethod("ignore"), NestMethod.Ignore)
+        self.assertEqual(NestMethod("ERROR"), NestMethod.Error)
+        self.assertEqual(NestMethod("Error"), NestMethod.Error)
+
+        with self.assertRaises(ValueError):
+            NestMethod("foo")
 
 
 class TestExpression(TestCase):
