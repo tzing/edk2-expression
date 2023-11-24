@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Doc: Clarify the operator precedence
+
 ## 0.2.0 (2023-11-14)
 
 * Enhance: `NestMethod` now supports case-insensitive matching

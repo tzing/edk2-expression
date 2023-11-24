@@ -13,7 +13,12 @@ if typing.TYPE_CHECKING:
     from pygments.token import Token
 
 OPERATOR_PRECEDENCE = {
-    # https://en.cppreference.com/w/c/language/operator_precedence
+    # The lower the number, the higher the precedence.
+    #
+    # The following numbers are borrowed from C operator precedence, and its
+    # precedence is the same as the EDK II specification.
+    #
+    # ref: https://en.cppreference.com/w/c/language/operator_precedence
     "!": 2,
     "~": 2,
     "*": 3,
@@ -33,10 +38,10 @@ OPERATOR_PRECEDENCE = {
     "^": 9,
     "|": 10,
     "&&": 11,
-    "xor": 12,  # not in C
-    "||": 13,  # shifted
-    ":": 14,  # not in C
-    "?": 15,  # shifted
+    "xor": 12,
+    "||": 13,
+    ":": 14,
+    "?": 15,
     "(": 99,
 }
 

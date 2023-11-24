@@ -90,13 +90,11 @@ See [example/](./example/) directory for more examples.
 | `<BitwiseXorExpress>`     | `^`                                          | Yes       |                 9 |
 | `<BitwiseOrExpress>`      | `\|`                                         | Yes       |                10 |
 | `<LogicalAndExpress>`     | `&&`, `AND`, `and`                           | Yes       |                11 |
-| `<LogicalXorExpress>`     | `XOR`, `xor`                                 | Yes       |   12[^shift-prec] |
-| `<LogicalOrExpress>`      | `\|\|`, `OR`, `or`                           | Yes       |   13[^shift-prec] |
-| `<CondExpress>`           | `?:` (ternary conditional)                   | Yes       |   15[^shift-prec] |
+| `<LogicalXorExpress>`     | `XOR`, `xor`                                 | Yes       |                12 |
+| `<LogicalOrExpress>`      | `\|\|`, `OR`, `or`                           | Yes       |                13 |
+| `<CondExpress>`           | `?:` (ternary conditional)                   | Yes       |                15 |
 
-[^prec]: The lower the number, the higher the precedence. It is almost the same order as the precedence in C language.
-
-[^shift-prec]: Logical XOR operator does not exist in C language so the precedence below it is shifted.
+[^prec]: The lower the number, the higher the precedence.
 
 
 ## Extras
