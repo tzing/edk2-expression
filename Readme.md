@@ -123,7 +123,34 @@ The syntax is defined as follows in EBNF:
 ```
 
 This function is not defined in EDK II specification therefore it is disabled by default.
-To enable it, manually uncomment the lines for `<MacroDefined>` in [lexer](./edk2_expression/lex.py).
+To enable it, uncomment the lines for `<MacroDefined>` in [lexer](./edk2_expression/lex.py):
+
+<details>
+<summary>patch</summary>
+
+```diff
+diff --git a/edk2_expression/lex.py b/edk2_expression/lex.py
+index ac66120..e87340b 100644
+--- a/edk2_expression/lex.py
++++ b/edk2_expression/lex.py
+@@ -64,10 +64,10 @@ class Edk2ExpressionLexer(RegexLexer):
+                 r"(\$\()([A-Z][A-Z0-9_]*)(\))",
+                 bygroups(Keyword.Declaration, Name.Variable, Keyword.Declaration),
+             ),
+-            # (  # <MacroDefined>
+-            #     rf"\b(DEFINED)(\()({CName})(\))",
+-            #     bygroups(Keyword.Type, Punctuation, Name.Variable, Punctuation),
+-            # ),
++            (  # <MacroDefined>
++                rf"\b(DEFINED)(\()({CName})(\))",
++                bygroups(Keyword.Type, Punctuation, Name.Variable, Punctuation),
++            ),
+             (rf"\b{CName}\b", Name.Variable),  # <CName>
+         ],
+         "array": [
+```
+
+</details>
 
 ## Changelog
 
