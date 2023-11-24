@@ -76,6 +76,14 @@ class TestUnaryOp(TestCase):
         self.expr.evaluate.return_value = 7
         self.expr.__str__.return_value = "foo"
 
+    @patch.object(t.UnaryOp, "__abstractmethods__", frozenset())
+    @patch.object(t.UnaryOp, "__str__", lambda self: "foo")
+    def test_invalid_sub_expr(self):
+        with self.assertRaises(ParseError):
+            t.UnaryOp(1234)
+        with self.assertRaises(ParseError):
+            t.UnaryOp(Mock(t.TernaryOp.Decision))
+
     def test_LogicalNot(self):
         expr = t.LogicalNot(self.expr)
         self.assertFalse(expr.evaluate({}))
@@ -94,6 +102,14 @@ class TestBinaryOp(TestCase):
 
         self.right = MagicMock(spec=Expression)
         self.right.__str__.return_value = "bar"
+
+    @patch.object(t.BinaryOp, "__abstractmethods__", frozenset())
+    @patch.object(t.BinaryOp, "__str__", lambda self: "foo")
+    def test_invalid_sub_expr(self):
+        with self.assertRaises(ParseError):
+            t.BinaryOp(1234, Mock(Expression))
+        with self.assertRaises(ParseError):
+            t.BinaryOp(Mock(Expression), Mock(t.TernaryOp.Decision))
 
     @patch.object(t.BinaryOp, "__abstractmethods__", set())
     def test_evaluate_nested(self):
@@ -368,6 +384,13 @@ class TestTernaryOp(TestCase):
 
         expr = t.TernaryOp(cond, t.TernaryOp.Decision(true, false))
         self.assertEqual(str(expr), "condition ? foo : bar")
+
+    @patch.object(t.TernaryOp.Decision, "__str__", lambda self: "foo")
+    def test_invalid_sub_expr(self):
+        with self.assertRaises(ParseError):
+            t.TernaryOp.Decision(1234, Mock(Expression))
+        with self.assertRaises(ParseError):
+            t.TernaryOp.Decision(Mock(Expression), Mock(t.TernaryOp.Decision))
 
     def test_ensure_colon(self):
         invalid_expr = MagicMock(spec=Expression)

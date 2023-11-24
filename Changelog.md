@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Fix: Prevent output incomplete expression like `1 : 2`
 * Doc: Clarify the operator precedence
 
 ## 0.2.0 (2023-11-14)

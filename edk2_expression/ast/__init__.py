@@ -78,4 +78,8 @@ def parse(tokens: list[tuple[int, Token, str]]) -> Expression:
             f"Unbalanced operators or operands in expression '{raw_expression}'"
         )
 
-    return output_stack[-1]
+    output = output_stack[0]
+    if not isinstance(output, Expression):
+        raise ParseError(f"Invalid expression '{raw_expression}'")
+
+    return output

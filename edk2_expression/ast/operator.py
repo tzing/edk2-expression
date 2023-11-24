@@ -174,6 +174,10 @@ class Operator(Expression):
 class UnaryOp(Operator):
     sub: Expression
 
+    def __post_init__(self):
+        if not isinstance(self.sub, Expression):
+            raise ParseError(f"Missing operand for operator '{self}'")
+
     @abstractmethod
     def evaluate(
         self, context: dict[str, object], nest: NestMethod | str = _DEFAULT_NEST_METHOD
@@ -207,6 +211,12 @@ class BitwiseNot(UnaryOp):
 class BinaryOpBase(Operator):
     left: Expression
     right: Expression
+
+    def __post_init__(self):
+        if not isinstance(self.left, Expression):
+            raise ParseError(f"Missing left operand for operator '{self}'")
+        if not isinstance(self.right, Expression):
+            raise ParseError(f"Missing right operand for operator '{self}'")
 
 
 @dataclass(frozen=True)
@@ -459,11 +469,17 @@ class LogicalOr(BinaryOpBase):
 @dataclass(frozen=True)
 class TernaryOp(Operator):
     @dataclass(frozen=True)
-    class Decision(Operator):
+    class Decision:
         """Value holder for ternary operator."""
 
         true: Expression
         false: Expression
+
+        def __post_init__(self):
+            if not isinstance(self.true, Expression):
+                raise ParseError(f"Missing true value for operator '{self}'")
+            if not isinstance(self.false, Expression):
+                raise ParseError(f"Missing false value for operator '{self}'")
 
         def __str__(self) -> str:
             return f"{self.true} : {self.false}"

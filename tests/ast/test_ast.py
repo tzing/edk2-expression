@@ -81,3 +81,8 @@ class TestParseExpression(TestCase):
             str(cm.exception),
             "Unexpected component '$' from '3 +$' position 3",
         )
+
+    def test_unexpected_operator(self):
+        with self.assertRaises(ParseError) as cm:
+            parse(self.lex("3 :6"))
+        self.assertEqual(str(cm.exception), "Invalid expression '3 :6'")
